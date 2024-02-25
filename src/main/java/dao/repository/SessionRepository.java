@@ -1,25 +1,24 @@
-package dao.postgresql;
+package dao.repository;
 
-import dao.UserDAO;
+import dao.SessionDAO;
+import entity.Session;
 import entity.User;
-import org.hibernate.Session;
 import org.hibernate.query.Query;
 import utility.HibernateUtility;
 
 import java.util.Optional;
 
-public class UserRepository implements UserDAO {
-
+public class SessionRepository implements SessionDAO {
     @Override
-    public Optional<User> find(Long id) {
-        Session session = HibernateUtility.getSessionFactory().openSession();
+    public Optional<Session> find(Long id) {
+        var session = HibernateUtility.getSessionFactory().openSession();
 
-        User user = null;
+        Session userSession = null;
 
         try{
             session.beginTransaction();
 
-            user = session.find(User.class, id);
+            userSession = session.find(Session.class, id);
 
             session.getTransaction().commit();
         }catch(RuntimeException ex){
@@ -29,33 +28,34 @@ public class UserRepository implements UserDAO {
             session.close();
         }
 
-        return Optional.ofNullable(user);
+        return Optional.ofNullable(userSession);
     }
 
     @Override
-    public Optional<User> findByLogin(String login) {
-        Session session = HibernateUtility.getSessionFactory().openSession();
+    public Optional<Session> findByUser(User user) {
+        var session = HibernateUtility.getSessionFactory().openSession();
 
-        User user = null;
+        Session userSession = null;
 
-        String hql = "select u from users u where u.login like :login";
-        Query<User> query = session.createQuery(hql, User.class);
+        String hql = "select s from sessions s where s.user.id like :id";
+        Query<Session> query = session.createQuery(hql, Session.class);
 
         try{
-            query.setParameter("login", login);
-            user = query.getSingleResult();
+            query.setParameter("id", user.getId());
+            userSession = query.getSingleResult();
         }catch (RuntimeException ex){
+            session.getTransaction().rollback();
             ex.printStackTrace();
         }finally {
             session.close();
         }
 
-        return Optional.ofNullable(user);
+        return Optional.ofNullable(userSession);
     }
 
     @Override
-    public void save(User entity) {
-        Session session = HibernateUtility.getSessionFactory().openSession();
+    public void save(Session entity) {
+        var session = HibernateUtility.getSessionFactory().openSession();
 
         try{
             session.beginTransaction();
@@ -72,15 +72,15 @@ public class UserRepository implements UserDAO {
     }
 
     @Override
-    public void update(User entity) {
-        Session session = HibernateUtility.getSessionFactory().openSession();
+    public void update(Session entity) {
+        var session = HibernateUtility.getSessionFactory().openSession();
 
         try{
             session.beginTransaction();
 
-            var user = session.find(User.class, entity.getId());
-            user.setLogin(entity.getLogin());
-            user.setPassword(entity.getPassword());
+            var userSession = session.find(Session.class, entity.getId());
+            userSession.setUser(entity.getUser());
+            userSession.setExpiresAt(entity.getExpiresAt());
 
             session.getTransaction().commit();
         }catch(RuntimeException ex){
@@ -93,14 +93,14 @@ public class UserRepository implements UserDAO {
 
     @Override
     public void delete(Long id) {
-        Session session = HibernateUtility.getSessionFactory().openSession();
+        var session = HibernateUtility.getSessionFactory().openSession();
 
         try{
             session.beginTransaction();
 
-            var user = session.find(User.class, id);
-            if(user != null)
-                session.remove(user);
+            var userSession = session.find(Session.class, id);
+            if(userSession != null)
+                session.remove(userSession);
 
             session.getTransaction().commit();
         }catch (RuntimeException ex){
