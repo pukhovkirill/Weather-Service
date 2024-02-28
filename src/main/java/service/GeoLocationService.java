@@ -1,6 +1,5 @@
 package service;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,22 +7,23 @@ import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 import model.Coordinates;
-import utility.Utilities;
+import utility.PropertiesUtility;
 
 public class GeoLocationService {
-    private final static String GEO_SERVICE_URI = "http://api.openweathermap.org/geo/1.0/direct";
-    private String apiKey;
+    private final String apiKey;
+    private final String uri;
 
     public GeoLocationService(){
-        this.apiKey = Utilities.getOpenWeatherApiKey();
+        this.apiKey = PropertiesUtility.getOpenWeatherApiKey();
+        this.uri = PropertiesUtility.getOpenWeatherGeoLocationUri();
     }
 
-    public Coordinates findCoordinatesByName(String name){
+    public Coordinates[] findCoordinatesByName(String name){
         HttpResponse<JsonNode> jsonResponse =
-                Unirest.get(GEO_SERVICE_URI)
+                Unirest.get(uri)
                         .header("accept", "application/json")
                         .queryString("q", name)
-                        .queryString("limit", 1)
+                        .queryString("limit", 5)
                         .queryString("appid", apiKey).asJson();
 
         var objectMapper = new ObjectMapper();
@@ -37,6 +37,10 @@ public class GeoLocationService {
             throw new RuntimeException(e);
         }
 
-        return coordinates[0];
+        return coordinates;
+    }
+
+    public Coordinates findFirstCoordinateByName(String name){
+        return findCoordinatesByName(name)[0];
     }
 }

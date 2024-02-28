@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
-public class Utilities {
+public class PropertiesUtility {
     private static Properties weatherProperties;
 
     public static String getOpenWeatherApiKey(){
@@ -13,7 +13,11 @@ public class Utilities {
     }
 
     public static String getOpenWeatherUri(){
-        return getProperty("weather.ow_uri");
+        return getProperty("weather.ow_weather_uri");
+    }
+
+    public static String getOpenWeatherGeoLocationUri(){
+        return getProperty("weather.ow_geo_location_uri");
     }
 
     private static String getProperty(String key){

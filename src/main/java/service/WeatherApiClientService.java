@@ -11,18 +11,6 @@ public class WeatherApiClientService {
         this.forecast = factory.getWeatherForecast(location);
     }
 
-    public WeatherApiClientService(WeatherFactory factory, String locationName){
-        this.forecast = factory.getWeatherForecast(locationName);
-    }
-
-    public WeatherApiClientService(WeatherFactory factory, double latitude, double longitude){
-        this.forecast = factory.getWeatherForecast(latitude, longitude);
-    }
-
-    public WeatherForecast seeWeatherForecast(){
-        return this.forecast;
-    }
-
     public CurrentWeather seeCurrentWeather(){
         return this.forecast.getCurrent();
     }

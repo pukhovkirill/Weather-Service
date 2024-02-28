@@ -10,15 +10,15 @@ import service.GeoLocationService;
 import service.weather.CurrentWeather;
 import service.weather.DailyWeather;
 import service.weather.WeatherForecast;
-import utility.Utilities;
+import utility.PropertiesUtility;
 
 public class OpenWeatherFactory implements WeatherFactory{
-    private String apiKey;
-    private String uri;
+    private final String apiKey;
+    private final String uri;
 
     public OpenWeatherFactory(){
-        this.apiKey = Utilities.getOpenWeatherApiKey();
-        this.uri = Utilities.getOpenWeatherUri();
+        this.apiKey = PropertiesUtility.getOpenWeatherApiKey();
+        this.uri = PropertiesUtility.getOpenWeatherUri();
     }
 
     @Override
@@ -29,7 +29,7 @@ public class OpenWeatherFactory implements WeatherFactory{
     @Override
     public WeatherForecast getWeatherForecast(String locationName) {
         var geoService = new GeoLocationService();
-        var coordinates = geoService.findCoordinatesByName(locationName);
+        var coordinates = geoService.findFirstCoordinateByName(locationName);
 
         return getWeatherForecast(coordinates.getLatitude(), coordinates.getLongitude());
     }
