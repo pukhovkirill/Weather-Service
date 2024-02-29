@@ -7,20 +7,25 @@ import java.util.Properties;
 
 public class PropertiesUtility {
     private static Properties weatherProperties;
+    private static Properties applicationProperties;
 
     public static String getOpenWeatherApiKey(){
-        return getProperty("weather.ow_api");
+        return getWeatherProperty("weather.ow_api");
     }
 
     public static String getOpenWeatherUri(){
-        return getProperty("weather.ow_weather_uri");
+        return getWeatherProperty("weather.ow_weather_uri");
     }
 
     public static String getOpenWeatherGeoLocationUri(){
-        return getProperty("weather.ow_geo_location_uri");
+        return getWeatherProperty("weather.ow_geo_location_uri");
     }
 
-    private static String getProperty(String key){
+    public static String getKeyStoragePassword(){
+        return getApplicationProperty("app.key_storage_password");
+    }
+
+    private static String getWeatherProperty(String key){
         if(weatherProperties == null)
             readWeatherProperties();
 
@@ -31,6 +36,25 @@ public class PropertiesUtility {
         try{
             weatherProperties = new Properties();
             var fis = new FileInputStream("src/main/resources/weather.properties");
+            weatherProperties.load(fis);
+        }catch(FileNotFoundException ex){
+            ex.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static String getApplicationProperty(String key){
+        if(applicationProperties == null)
+            readApplicationProperties();
+
+        return applicationProperties.getProperty(key);
+    }
+
+    private static void readApplicationProperties(){
+        try{
+            weatherProperties = new Properties();
+            var fis = new FileInputStream("src/main/resources/app.properties");
             weatherProperties.load(fis);
         }catch(FileNotFoundException ex){
             ex.printStackTrace();

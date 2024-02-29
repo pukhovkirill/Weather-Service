@@ -25,6 +25,9 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "public_key", nullable = false)
+    private String publicKey;
+
     @ManyToMany(mappedBy = "users")
     private Set<Location> locations;
 }

@@ -5,7 +5,6 @@ import dao.UserDAO;
 import entity.Session;
 import entity.User;
 import service.encryption.EncryptionService;
-import service.encryption.KeyStorage;
 
 import java.sql.Timestamp;
 import java.util.HashSet;
@@ -23,12 +22,15 @@ public class AuthorizationService {
     }
 
     public void registration(String login, String password){
-        User user = new User();
+        var publicKey = encryptionService.generateKey();
+        var salt = encryptionService.hash(publicKey);
 
+        User user = new User();
         user.setLogin(login);
 
-        var hashedPassword = hashPassword(password);
+        var hashedPassword = encryptionService.encrypt(password, publicKey, salt);
         user.setPassword(hashedPassword);
+        user.setPublicKey(publicKey);
 
         user.setLocations(new HashSet<>());
 
@@ -41,8 +43,13 @@ public class AuthorizationService {
         if(optionalUser.isEmpty())
             return Optional.empty();
 
-        var hashedPassword = optionalUser.get().getPassword();
-        var unhashedPassword = unhashPassword(hashedPassword);
+        var user = optionalUser.get();
+
+        var publicKey = user.getPublicKey();
+        var salt = encryptionService.hash(publicKey);
+
+        var hashedPassword = user.getPassword();
+        var unhashedPassword = encryptionService.decrypt(hashedPassword, publicKey, salt);
 
         if(unhashedPassword.equals(password))
             return optionalUser;
@@ -77,19 +84,5 @@ public class AuthorizationService {
 
         sessionRepository.delete(session.get().getId());
         return true;
-    }
-
-    private String hashPassword(String password){
-        String alias = encryptionService.getKeyAlias();
-        String key = KeyStorage.retrievingFromKeyStore(alias);
-
-        return encryptionService.encrypt(password, key);
-    }
-
-    private String unhashPassword(String ciphertext){
-        String alias = encryptionService.getKeyAlias();
-        String key = KeyStorage.retrievingFromKeyStore(alias);
-
-        return encryptionService.decrypt(ciphertext, key);
     }
 }

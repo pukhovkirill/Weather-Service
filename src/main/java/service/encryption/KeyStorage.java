@@ -9,18 +9,17 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
-import java.util.UUID;
 
 public class KeyStorage {
 
-    public static String storingIntoKeyStore(String key){
+    private static final String KEY_STORAGE_PATH = "src/main/resources/key_storage.jceks";
+
+    public static void storingIntoKeyStore(String key, String alias){
         try {
-            String alias = UUID.randomUUID().toString();
             KeyStore keyStore = KeyStore.getInstance("JCEKS");
 
-            char[] password = "changeit".toCharArray();
-            String path = "$JAVA_SECURITY/cacerts";
-            java.io.FileInputStream fis = new FileInputStream(path);
+            char[] password = "d5210aef4e902bb04f7".toCharArray();
+            java.io.FileInputStream fis = new FileInputStream(KEY_STORAGE_PATH);
             keyStore.load(fis, password);
 
             KeyStore.ProtectionParameter protectionParam = new KeyStore.PasswordProtection(password);
@@ -29,7 +28,10 @@ public class KeyStorage {
 
             keyStore.setEntry(alias, secretKeyEntry, protectionParam);
 
-            return alias;
+            java.io.FileOutputStream fos;
+            fos = new java.io.FileOutputStream(KEY_STORAGE_PATH);
+            keyStore.store(fos, password);
+            System.out.println("data stored");
         } catch (NoSuchAlgorithmException |
                  CertificateException |
                  KeyStoreException |
@@ -38,21 +40,19 @@ public class KeyStorage {
         }
     }
 
-    public static String retrievingFromKeyStore(String alias){
+    public static SecretKey retrievingFromKeyStore(String alias){
         try {
             KeyStore keyStore = KeyStore.getInstance("JCEKS");
 
-            char[] password = "changeit".toCharArray();
-            String path = "$JAVA_SECURITY/cacerts";
-            java.io.FileInputStream fis = new FileInputStream(path);
+            char[] password = "d5210aef4e902bb04f7".toCharArray();
+            java.io.FileInputStream fis = new FileInputStream(KEY_STORAGE_PATH);
             keyStore.load(fis, password);
 
             KeyStore.ProtectionParameter protectionParam = new KeyStore.PasswordProtection(password);
-            KeyStore.SecretKeyEntry secretKeyEntry = (KeyStore.SecretKeyEntry) keyStore.getEntry(alias, protectionParam);
+            KeyStore.Entry secretEntry =  keyStore.getEntry(alias, protectionParam);
+            KeyStore.SecretKeyEntry secretKeyEntry = ((KeyStore.SecretKeyEntry) secretEntry);
 
-            SecretKey mySecretKey = secretKeyEntry.getSecretKey();
-
-            return mySecretKey.toString();
+            return secretKeyEntry.getSecretKey();
         } catch (UnrecoverableEntryException |
                  NoSuchAlgorithmException |
                  CertificateException |
