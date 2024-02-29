@@ -2,6 +2,7 @@ package dao.repository;
 
 import dao.LocationDAO;
 import entity.Location;
+import jakarta.persistence.NoResultException;
 import org.hibernate.query.Query;
 import utility.HibernateUtility;
 
@@ -37,7 +38,7 @@ public class LocationRepository implements LocationDAO {
 
         Location location = null;
 
-        String hql = "select l from locations l where l.latitude like :latitude and l.longitude like :longitude";
+        String hql = "select l from locations l where l.latitude = :latitude and l.longitude = :longitude";
         Query<Location> query = session.createQuery(hql, Location.class);
 
         try{
@@ -45,6 +46,8 @@ public class LocationRepository implements LocationDAO {
             query.setParameter("longitude", longitude);
 
             location = query.getSingleResult();
+        }catch (NoResultException nre){
+            return Optional.empty();
         }catch(RuntimeException ex){
             session.getTransaction().rollback();
             ex.printStackTrace();
@@ -67,7 +70,9 @@ public class LocationRepository implements LocationDAO {
         try{
             query.setParameter("name", name);
             location = query.getSingleResult();
-        }catch (RuntimeException ex){
+        }catch (NoResultException nre){
+            return Optional.empty();
+        }catch (RuntimeException ex) {
             session.getTransaction().rollback();
             ex.printStackTrace();
         }finally {

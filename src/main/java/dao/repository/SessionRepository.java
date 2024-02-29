@@ -3,6 +3,7 @@ package dao.repository;
 import dao.SessionDAO;
 import entity.Session;
 import entity.User;
+import jakarta.persistence.NoResultException;
 import org.hibernate.query.Query;
 import utility.HibernateUtility;
 
@@ -37,12 +38,14 @@ public class SessionRepository implements SessionDAO {
 
         Session userSession = null;
 
-        String hql = "select s from sessions s where s.user.id like :id";
+        String hql = "select s from sessions s where s.user.id = :id";
         Query<Session> query = session.createQuery(hql, Session.class);
 
         try{
             query.setParameter("id", user.getId());
             userSession = query.getSingleResult();
+        }catch (NoResultException nre){
+            return Optional.empty();
         }catch (RuntimeException ex){
             session.getTransaction().rollback();
             ex.printStackTrace();

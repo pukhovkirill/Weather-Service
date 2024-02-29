@@ -37,7 +37,7 @@ public class UserRepository implements UserDAO {
 
         User user = null;
 
-        String hql = "select u from users u where u.login like :login";
+        String hql = "select u from users u where u.login = :login";
         Query<User> query = session.createQuery(hql, User.class);
 
         try{

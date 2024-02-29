@@ -5,7 +5,7 @@
     <session-factory>
         <property name="connection.url">jdbc:postgresql://localhost:5432/wsdb</property>
         <property name="connection.driver_class">org.postgresql.Driver</property>
-        <property name="connection.username">postgres</property>
+        <property name="connection.username">yukir</property>
         <property name="connection.password" />
 
         <property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
@@ -14,6 +14,8 @@
         <property name="show_sql">true</property>
         <property name="format_sql">true</property>
 
-        <!--<mapping class="beans.Task"/>-->
+        <mapping class="entity.Location" />
+        <mapping class="entity.Session" />
+        <mapping class="entity.User" />
     </session-factory>
 </hibernate-configuration>

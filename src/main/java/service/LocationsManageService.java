@@ -19,7 +19,7 @@ public class LocationsManageService {
     }
 
     public Optional<Location> getOrPersist(Coordinates coordinates){
-        Location location = null;
+        Location location;
 
         var optionalLocation =
                 this.locationRepository.findByCoordinates(
