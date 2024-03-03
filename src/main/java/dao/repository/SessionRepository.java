@@ -8,10 +8,11 @@ import org.hibernate.query.Query;
 import utility.HibernateUtility;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public class SessionRepository implements SessionDAO {
     @Override
-    public Optional<Session> find(Long id) {
+    public Optional<Session> find(UUID uuid) {
         var session = HibernateUtility.getSessionFactory().openSession();
 
         Session userSession = null;
@@ -19,7 +20,7 @@ public class SessionRepository implements SessionDAO {
         try{
             session.beginTransaction();
 
-            userSession = session.find(Session.class, id);
+            userSession = session.find(Session.class, uuid);
 
             session.getTransaction().commit();
         }catch(RuntimeException ex){
@@ -81,7 +82,7 @@ public class SessionRepository implements SessionDAO {
         try{
             session.beginTransaction();
 
-            var userSession = session.find(Session.class, entity.getId());
+            var userSession = session.find(Session.class, entity.getUuid());
             userSession.setUser(entity.getUser());
             userSession.setExpiresAt(entity.getExpiresAt());
 

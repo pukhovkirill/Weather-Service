@@ -14,8 +14,8 @@ public class GeoLocationService {
     private final String uri;
 
     public GeoLocationService(){
-        this.apiKey = PropertiesUtility.getOpenWeatherApiKey();
-        this.uri = PropertiesUtility.getOpenWeatherGeoLocationUri();
+        this.apiKey = PropertiesUtility.getApplicationProperty("weather.ow_api");
+        this.uri = PropertiesUtility.getApplicationProperty("weather.ow_geo_location_uri");
     }
 
     public Coordinates[] findCoordinatesByName(String name){

@@ -1,5 +1,7 @@
 package service.encryption;
 
+import utility.PropertiesUtility;
+
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.FileInputStream;
@@ -11,14 +13,17 @@ import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
 
 public class KeyStorage {
+    private static final String keyStoragePassword =
+            PropertiesUtility.getApplicationProperty("app.key_storage_password");
 
-    private static final String KEY_STORAGE_PATH = "src/main/resources/key_storage.jceks";
+    private static final String KEY_STORAGE_PATH =
+            PropertiesUtility.getApplicationProperty("app.key_storage_path");
 
     public static void storingIntoKeyStore(String key, String alias){
         try {
             KeyStore keyStore = KeyStore.getInstance("JCEKS");
 
-            char[] password = "d5210aef4e902bb04f7".toCharArray();
+            char[] password = keyStoragePassword.toCharArray();
             java.io.FileInputStream fis = new FileInputStream(KEY_STORAGE_PATH);
             keyStore.load(fis, password);
 
@@ -31,7 +36,6 @@ public class KeyStorage {
             java.io.FileOutputStream fos;
             fos = new java.io.FileOutputStream(KEY_STORAGE_PATH);
             keyStore.store(fos, password);
-            System.out.println("data stored");
         } catch (NoSuchAlgorithmException |
                  CertificateException |
                  KeyStoreException |
@@ -44,7 +48,7 @@ public class KeyStorage {
         try {
             KeyStore keyStore = KeyStore.getInstance("JCEKS");
 
-            char[] password = "d5210aef4e902bb04f7".toCharArray();
+            char[] password = keyStoragePassword.toCharArray();
             java.io.FileInputStream fis = new FileInputStream(KEY_STORAGE_PATH);
             keyStore.load(fis, password);
 

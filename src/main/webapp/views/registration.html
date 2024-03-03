@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign up</title>
+  <link rel="stylesheet" href="../css/bootstrap.css" />
+  <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol id="weather" viewBox="0 0 16 16">
+      <title>Weather</title>
+      <path fill-rule="evenodd" clip-rule="evenodd" fill="#3dd5f3" d="M8.5 3a5 5 0 0 1 4.905 4.027A3 3 0 0 1 13 13h-1.5a.5.5 0 0 0 0-1H1.05a3.5 3.5 0 0 1-.713-1H9.5a.5.5 0 0 0 0-1H.035a3.5 3.5 0 0 1 0-1H7.5a.5.5 0 0 0 0-1H.337a3.5 3.5 0 0 1 3.57-1.977A5 5 0 0 1 8.5 3"/>
+    </symbol>
+  </svg>
+  <style>
+    .center-block {
+      display: block;
+      margin-right: auto;
+      margin-left: auto;
+    }
+  </style>
+</head>
+<body class="text-white bg-light">
+  <div class="text-secondary px-4 py-5 text-center">
+    <div class="py-5">
+      <div class="container w-25 m-auto bg-dark" style="border-radius: 20px; width: 850px; display: table; padding: 15px;">
+        <form>
+          <svg class="bi my-5" width="100" height="100" role="img"><use xlink:href="#weather"></use></svg>
+          <h1 class="h3 mb-3 fw-normal">Sign up</h1>
+
+          <div class="center">
+            <input type="email" class="form-control form-control-dark w-75 center-block" placeholder="Login/Email">
+          </div>
+          <div>
+            <input type="password" class="form-control form-control-dark my-2 w-75 center-block" id="floatingPassword" placeholder="Password">
+          </div>
+
+          <button class="btn btn-info w-75 py-2 my-2" type="submit">Sign up</button>
+          <p class="mt-2 text-body-secondary">Already have an account -<a href="/" class="link-info px-2" >Sign in</a></p>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

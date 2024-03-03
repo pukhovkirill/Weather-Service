@@ -17,8 +17,8 @@ public class OpenWeatherFactory implements WeatherFactory{
     private final String uri;
 
     public OpenWeatherFactory(){
-        this.apiKey = PropertiesUtility.getOpenWeatherApiKey();
-        this.uri = PropertiesUtility.getOpenWeatherUri();
+        this.apiKey = PropertiesUtility.getApplicationProperty("weather.ow_api");
+        this.uri = PropertiesUtility.getApplicationProperty("weather.ow_weather_uri");
     }
 
     @Override

@@ -5,6 +5,7 @@ import dao.UserDAO;
 import entity.Session;
 import entity.User;
 import service.encryption.EncryptionService;
+import utility.PropertiesUtility;
 
 import java.sql.Timestamp;
 import java.util.HashSet;
@@ -14,11 +15,13 @@ public class AuthorizationService {
     private final UserDAO userRepository;
     private final SessionDAO sessionRepository;
     private final EncryptionService encryptionService;
+    private final Long cookieLifetime;
 
     public AuthorizationService(UserDAO userRepository, SessionDAO sessionRepository, EncryptionService encryptionService){
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
         this.encryptionService = encryptionService;
+        this.cookieLifetime = Long.valueOf(PropertiesUtility.getApplicationProperty("app.cookie_lifetime"));
     }
 
     public void registration(String login, String password){
@@ -37,7 +40,7 @@ public class AuthorizationService {
         userRepository.save(user);
     }
 
-    public Optional<User> authorization(String login, String password){
+    public Optional<Session> authorization(String login, String password){
         var optionalUser = userRepository.findByLogin(login);
 
         if(optionalUser.isEmpty())
@@ -51,10 +54,23 @@ public class AuthorizationService {
         var hashedPassword = user.getPassword();
         var unhashedPassword = encryptionService.decrypt(hashedPassword, publicKey, salt);
 
-        if(unhashedPassword.equals(password))
-            return optionalUser;
+        if(!unhashedPassword.equals(password))
+            return Optional.empty();
 
-        return Optional.empty();
+        return Optional.of(createSession(user));
+    }
+
+    private Session createSession(User user){
+        var session = new Session();
+
+        session.setUser(user);
+
+        var timestamp = new Timestamp(System.currentTimeMillis() + cookieLifetime);
+        session.setExpiresAt(timestamp);
+
+        this.sessionRepository.save(session);
+
+        return session;
     }
 
     public Optional<Session> findSession(User user){
