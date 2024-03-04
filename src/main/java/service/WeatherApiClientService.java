@@ -5,17 +5,29 @@ import service.weather.*;
 import service.weather.factory.WeatherFactory;
 
 public class WeatherApiClientService {
-    private final WeatherForecast forecast;
+    private final WeatherFactory factory;
 
-    public WeatherApiClientService(WeatherFactory factory, Location location){
-        this.forecast = factory.getWeatherForecast(location);
+    private WeatherForecast forecast;
+
+    public WeatherApiClientService(WeatherFactory factory){
+        this.factory = factory;
     }
 
-    public CurrentWeather seeCurrentWeather(){
+    public CurrentWeather getCurrentWeather(Location location){
+        if(forecast == null)
+            seeWeatherForecast(location);
+
         return this.forecast.getCurrent();
     }
 
-    public DailyWeather seeDailyWeather(){
+    public DailyWeather getDailyWeather(Location location){
+        if(forecast == null)
+            seeWeatherForecast(location);
+
         return this.forecast.getDaily();
+    }
+
+    private void seeWeatherForecast(Location location){
+        this.forecast =  this.factory.getWeatherForecast(location);
     }
 }
