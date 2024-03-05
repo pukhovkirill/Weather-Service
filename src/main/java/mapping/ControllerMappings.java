@@ -1,7 +1,6 @@
 package mapping;
 
-import controller.HomeController;
-import controller.MappingController;
+import controller.*;
 import org.thymeleaf.web.IWebRequest;
 
 import java.util.HashMap;
@@ -14,6 +13,8 @@ public class ControllerMappings {
     static{
         controllerStorage = new HashMap<>();
         controllerStorage.put("/", new HomeController());
+        controllerStorage.put("/login", new LoginController());
+        controllerStorage.put("/registration", new RegistrationController());
     }
 
     public static MappingController resolveControllerForRequest(final IWebRequest request) {

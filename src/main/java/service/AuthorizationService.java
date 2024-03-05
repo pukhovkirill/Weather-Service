@@ -73,7 +73,16 @@ public class AuthorizationService {
         return session;
     }
 
-    public Optional<Session> findSession(User user){
+    public Optional<Session> findSessionByUserId(Long id){
+         var user = this.userRepository.find(id);
+
+         if(user.isEmpty())
+             return Optional.empty();
+
+         return findSession(user.get());
+    }
+
+    private Optional<Session> findSession(User user){
         var optionalSession = sessionRepository.findByUser(user);
 
         if(optionalSession.isEmpty())
@@ -85,7 +94,7 @@ public class AuthorizationService {
         var current = new Timestamp(System.currentTimeMillis());
 
         if (current.compareTo(expiresAt) > 0) {
-            sessionRepository.delete(session.getId());
+            sessionRepository.delete(session.getUuid());
             return Optional.empty();
         }
 
@@ -98,7 +107,7 @@ public class AuthorizationService {
         if(session.isEmpty())
             return false;
 
-        sessionRepository.delete(session.get().getId());
+        sessionRepository.delete(session.get().getUuid());
         return true;
     }
 }

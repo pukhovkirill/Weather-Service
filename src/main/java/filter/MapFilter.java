@@ -1,5 +1,7 @@
 package filter;
 
+import controller.MappingController;
+import controller.ThymeleafTemplateEngine;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,6 +16,7 @@ import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 import java.io.IOException;
 
 public class MapFilter implements Filter {
+
     private ITemplateEngine templateEngine;
     private JakartaServletWebApplication application;
 
@@ -26,31 +29,26 @@ public class MapFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        if (!process((HttpServletRequest)servletRequest, (HttpServletResponse)servletRequest)) {
-            filterChain.doFilter(servletRequest, servletResponse);
-        }
+        process((HttpServletRequest) servletRequest, (HttpServletResponse) servletResponse);
     }
 
-    private boolean process(final HttpServletRequest request, final HttpServletResponse response)
+    private void process(final HttpServletRequest request, final HttpServletResponse response)
             throws ServletException, IOException {
         try{
             final var webExchange = this.application.buildExchange(request, response);
             final var webRequest = webExchange.getRequest();
 
             if (
-                    webRequest.getPathWithinApplication().startsWith("/css") ||
                     webRequest.getPathWithinApplication().startsWith("/img") ||
-                    webRequest.getPathWithinApplication().startsWith("/js")  ||
-                    webRequest.getPathWithinApplication().startsWith("/icon")
+                    webRequest.getPathWithinApplication().startsWith("/icon")||
+                    webRequest.getPathWithinApplication().startsWith("/template")
             ){
-                return false;
+                return;
             }
-
 
             final var controller = ControllerMappings.resolveControllerForRequest(webRequest);
-            if (controller == null) {
-                return false;
-            }
+            if (controller == null)
+                return;
 
             response.setContentType("text/html;charset=UTF-8");
             response.setHeader("Pragma", "no-cache");
@@ -60,13 +58,27 @@ public class MapFilter implements Filter {
 
             final var writer = response.getWriter();
 
-            controller.process(webExchange, this.templateEngine, writer);
-
-            return true;
+            final var thymeleafEngine = new ThymeleafTemplateEngine(webExchange, this.templateEngine, writer);
+            executeHttpMethod(controller, thymeleafEngine, request, response);
         }catch (Exception ex){
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
-        return false;
+    }
+
+    private void executeHttpMethod(MappingController controller, ThymeleafTemplateEngine engine, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        final var method = engine.getWebExchange().getRequest().getMethod();
+
+        switch (method.toLowerCase()){
+            case "get" -> controller.processGet(engine, req, resp);
+            case "head" -> controller.processHead(engine, req, resp);
+            case "post" -> controller.processPost(engine, req, resp);
+            case "put" -> controller.processPut(engine, req, resp);
+            case "delete" -> controller.processDelete(engine, req, resp);
+            case "connect" -> controller.processConnect(engine, req, resp);
+            case "options" -> controller.processOptions(engine, req, resp);
+            case "trace" -> controller.processTrace(engine, req, resp);
+            case "patch" -> controller.processPatch(engine, req, resp);
+        }
     }
 
     private static ITemplateEngine buildTemplateEngine(final IWebApplication application) {

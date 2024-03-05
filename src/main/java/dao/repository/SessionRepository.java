@@ -96,13 +96,13 @@ public class SessionRepository implements SessionDAO {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(UUID uuid) {
         var session = HibernateUtility.getSessionFactory().openSession();
 
         try{
             session.beginTransaction();
 
-            var userSession = session.find(Session.class, id);
+            var userSession = session.find(Session.class, uuid);
             if(userSession != null)
                 session.remove(userSession);
 

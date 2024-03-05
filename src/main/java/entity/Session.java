@@ -20,7 +20,7 @@ public class Session {
     @Column(name = "id", nullable = false, unique = true)
     private UUID uuid;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true)
     private User user;
 

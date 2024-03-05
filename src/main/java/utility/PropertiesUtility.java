@@ -18,7 +18,7 @@ public class PropertiesUtility {
     private static void readApplicationProperties(){
         try{
             applicationProperties = new Properties();
-            var fis = new FileInputStream("src/main/resources/app.properties");
+            var fis = new FileInputStream("/home/yukir/IdeaProjects/Weather-Service/src/main/resources/app.properties");
             applicationProperties.load(fis);
         }catch(FileNotFoundException ex){
             ex.printStackTrace();

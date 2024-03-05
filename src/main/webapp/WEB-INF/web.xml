@@ -5,12 +5,35 @@
          version="5.0">
 
     <filter>
+        <filter-name>AuthFilter</filter-name>
+        <filter-class>filter.AuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter>
         <filter-name>MapFilter</filter-name>
         <filter-class>filter.MapFilter</filter-class>
     </filter>
-
     <filter-mapping>
         <filter-name>MapFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+
+    <!--  error pages-->
+    <error-page>
+        <error-code>404</error-code>
+        <location>/views/404_error_page_option.html</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/views/500_error_page_option.html</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.Throwable</exception-type>
+        <location>/views/error_page_option.html</location>
+    </error-page>
+
 </web-app>

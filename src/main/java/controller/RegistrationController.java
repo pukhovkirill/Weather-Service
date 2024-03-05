@@ -1,15 +1,10 @@
 package controller;
 
-import entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.WebContext;
-import org.thymeleaf.web.IWebExchange;
 
-import java.io.Writer;
-
-public class HomeController implements MappingController{
+public class RegistrationController extends AuthBaseController{
 
     @Override
     public void processGet(ThymeleafTemplateEngine engine, HttpServletRequest req, HttpServletResponse resp) throws Exception {
@@ -18,11 +13,18 @@ public class HomeController implements MappingController{
         var writer = engine.getWriter();
 
         WebContext ctx = new WebContext(webExchange, webExchange.getLocale());
-        var session = req.getSession();
 
-        var user = (User) session.getAttribute("user");
-
-        ctx.setVariable("user", user);
-        templateEngine.process("index", ctx, writer);
+        templateEngine.process("registration", ctx, writer);
     }
+
+    @Override
+    public void processPost(ThymeleafTemplateEngine engine, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+
+        var email = req.getParameter("email");
+        var password = req.getParameter("password");
+
+        authorizationService.registration(email, password);
+        resp.sendRedirect("/login");
+    }
+
 }
