@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.HashSet;
 import java.util.Set;
 
 @Setter
@@ -27,7 +29,7 @@ public class Location {
             joinColumns = { @JoinColumn(name = "user_id") },
             inverseJoinColumns = { @JoinColumn(name = "location_id") }
     )
-    private Set<User> users;
+    private Set<User> users = new HashSet<>();
 
     @Column(name = "latitude", nullable = false, unique = true)
     private Double latitude;

@@ -28,14 +28,14 @@
           <h1 class="h3 mb-3 fw-normal">Sign in</h1>
 
           <div class="center">
-            <input th:name="email" type="email" class="form-control form-control-dark w-75 center-block" placeholder="Login/Email">
+            <input th:name="email" type="email" class="form-control form-control-dark w-75 center-block" placeholder="Login/Email" required>
           </div>
           <div>
-            <input th:name="password" name="password" type="password" class="form-control form-control-dark my-2 w-75 center-block" id="floatingPassword" placeholder="Password">
+            <input th:name="password" name="password" type="password" class="form-control form-control-dark my-2 w-75 center-block" id="floatingPassword" placeholder="Password" required>
           </div>
 
           <button class="btn btn-info w-75 py-2 my-2" type="submit">Sign in</button>
-          <p class="mt-2 text-secondary">Don't have an account yet - <a href="/static" class="link-info px-2" >Sign up</a></p>
+          <p class="mt-2 text-secondary">Don't have an account yet - <a href="/registration" class="link-info px-2" >Sign up</a></p>
         </form>
       </div>
     </div>

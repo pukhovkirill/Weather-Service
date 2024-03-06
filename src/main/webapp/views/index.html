@@ -36,18 +36,17 @@
                     <span class="fs-5">Weather service</span>
                 </a>
 
-                <form class="col-12 col-md-3 mb-2 d-flex justify-content-center mb-md-0">
-                    <input type="search" class="form-control form-control-dark" placeholder="Enter the location name" aria-label="Search" th:disabled="${user == null} ? 'true' : 'false'">
-                    <input type="submit" class="btn btn-info ms-2" value="Search" th:disabled="${user == null} ? 'true' : 'false'"/>
+                <form th:action="@{/}" th:method="post" class="col-12 col-md-3 mb-2 d-flex justify-content-center mb-md-0">
+                    <input name="wanted" type="search" class="form-control form-control-dark" placeholder="Enter the location name" aria-label="Search" th:disabled="${not is_user_authorized}" required>
+                    <input type="submit" class="btn btn-info ms-2" value="Search" th:disabled="${not is_user_authorized}"/>
                 </form>
 
-                <div class="col-md-3 text-end" th:if="${user == null}">
+                <div class="col-md-3 text-end" th:if="${is_user_authorized}">
+                    <a href="/logout" class="btn btn-info">Logout</a>
+                </div>
+                <div class="col-md-3 text-end" th:unless="${is_user_authorized}">
                     <a href="/login" class="btn btn-outline-info me-2">Login</a>
                     <a href="/registration" class="btn btn-info">Sign up</a>
-                </div>
-
-                <div class="col-md-3 text-end" th:unless="${user == null}">
-                    <a href="/" class="btn btn-info">Logout</a>
                 </div>
             </div>
         </div>
@@ -55,19 +54,19 @@
 
     <div>
 
-        <div class="text-secondary px-4 py-5 text-center" th:hidden="${user == null} ? 'false' : 'true'">
+        <div class="text-secondary px-4 py-5 text-center" th:hidden="${not forecasts.isEmpty()}">
             <div class="py-5">
                 <h1 class="display-5 fw-bold text-dark mb-5">Current Weather</h1>
                 <svg class="bi" width="96" height="96" role="img"><use xlink:href="#nodata"></use></svg>
                 <div class="col-lg-6 mx-auto">
                     <p class="fs-5 mb-4 text-dark">Location Required for Weather Information</p>
-                    <p class="fs-5 mb-4" th:if="${user == null}">Please sign in and add a location to view weather.</p>
-                    <p class="fs-5 mb-4" th:unless="${user == null}">Please add a location to view weather. You can do it by using the search bar above.</p>
+                    <p class="fs-5 mb-4" th:if="${is_user_authorized}">Please add a location to view weather. You can do it by using the search bar above.</p>
+                    <p class="fs-5 mb-4" th:unless="${is_user_authorized}">Please sign in and add a location to view weather.</p>
                 </div>
             </div>
         </div>
 
-        <div class="text-white px-4 py-5 text-center" th:hidden="${user == null} ? 'true' : 'false'">
+        <div class="text-white px-4 py-5 text-center" th:hidden="${forecasts.isEmpty()}">
             <h1 class="display-5 fw-bold text-dark mb-4">Current Weather</h1>
             <div class="container">
 

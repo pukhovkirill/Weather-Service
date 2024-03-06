@@ -21,6 +21,8 @@ public class SessionRepository implements SessionDAO {
             session.beginTransaction();
 
             userSession = session.find(Session.class, uuid);
+            if(userSession != null)
+                userSession.getUser().getLocations().iterator();
 
             session.getTransaction().commit();
         }catch(RuntimeException ex){
@@ -45,6 +47,8 @@ public class SessionRepository implements SessionDAO {
         try{
             query.setParameter("id", user.getId());
             userSession = query.getSingleResult();
+            if(userSession != null)
+                userSession.getUser().getLocations().iterator();
         }catch (NoResultException nre){
             return Optional.empty();
         }catch (RuntimeException ex){
@@ -55,24 +59,6 @@ public class SessionRepository implements SessionDAO {
         }
 
         return Optional.ofNullable(userSession);
-    }
-
-    @Override
-    public void save(Session entity) {
-        var session = HibernateUtility.getSessionFactory().openSession();
-
-        try{
-            session.beginTransaction();
-
-            session.persist(entity);
-
-            session.getTransaction().commit();
-        }catch(RuntimeException ex){
-            session.getTransaction().rollback();
-            ex.printStackTrace();
-        }finally {
-            session.close();
-        }
     }
 
     @Override

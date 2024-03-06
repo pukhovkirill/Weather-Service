@@ -15,13 +15,13 @@ public class AuthorizationService {
     private final UserDAO userRepository;
     private final SessionDAO sessionRepository;
     private final EncryptionService encryptionService;
-    private final Long cookieLifetime;
+    private final Long sessionLifetime;
 
     public AuthorizationService(UserDAO userRepository, SessionDAO sessionRepository, EncryptionService encryptionService){
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
         this.encryptionService = encryptionService;
-        this.cookieLifetime = Long.valueOf(PropertiesUtility.getApplicationProperty("app.cookie_lifetime"));
+        this.sessionLifetime = Long.valueOf(PropertiesUtility.getApplicationProperty("app.session_lifetime"));
     }
 
     public void registration(String login, String password){
@@ -65,7 +65,7 @@ public class AuthorizationService {
 
         session.setUser(user);
 
-        var timestamp = new Timestamp(System.currentTimeMillis() + cookieLifetime);
+        var timestamp = new Timestamp(System.currentTimeMillis() + sessionLifetime);
         session.setExpiresAt(timestamp);
 
         this.sessionRepository.save(session);

@@ -35,29 +35,19 @@ public class MapFilter implements Filter {
     private void process(final HttpServletRequest request, final HttpServletResponse response)
             throws ServletException, IOException {
         try{
+            if(isForbiddenUri(request, response))
+                return;
+
             final var webExchange = this.application.buildExchange(request, response);
             final var webRequest = webExchange.getRequest();
-
-            if (
-                    webRequest.getPathWithinApplication().startsWith("/img") ||
-                    webRequest.getPathWithinApplication().startsWith("/icon")||
-                    webRequest.getPathWithinApplication().startsWith("/template")
-            ){
-                return;
-            }
 
             final var controller = ControllerMappings.resolveControllerForRequest(webRequest);
             if (controller == null)
                 return;
 
-            response.setContentType("text/html;charset=UTF-8");
-            response.setHeader("Pragma", "no-cache");
-            response.setHeader("Cache-Control", "no-cache");
-            response.setDateHeader("Expires", 0);
-
+            setRequiredHeaders(response);
 
             final var writer = response.getWriter();
-
             final var thymeleafEngine = new ThymeleafTemplateEngine(webExchange, this.templateEngine, writer);
             executeHttpMethod(controller, thymeleafEngine, request, response);
         }catch (Exception ex){
@@ -65,19 +55,35 @@ public class MapFilter implements Filter {
         }
     }
 
+    private boolean isForbiddenUri(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        var uri = req.getRequestURI();
+
+        if(req.getSession().getAttribute("user") != null){
+            if(uri.startsWith("/login") || uri.startsWith("/registration")){
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return true;
+            }
+        }
+
+        if(uri.startsWith("/img") || uri.startsWith("/icon")|| uri.startsWith("/template"))
+            return true;
+            
+        return false;
+    }
+
+    private void setRequiredHeaders(HttpServletResponse resp){
+        resp.setContentType("text/html;charset=UTF-8");
+        resp.setHeader("Pragma", "no-cache");
+        resp.setHeader("Cache-Control", "no-cache");
+        resp.setDateHeader("Expires", 0);
+    }
+
     private void executeHttpMethod(MappingController controller, ThymeleafTemplateEngine engine, HttpServletRequest req, HttpServletResponse resp) throws Exception {
         final var method = engine.getWebExchange().getRequest().getMethod();
 
         switch (method.toLowerCase()){
             case "get" -> controller.processGet(engine, req, resp);
-            case "head" -> controller.processHead(engine, req, resp);
             case "post" -> controller.processPost(engine, req, resp);
-            case "put" -> controller.processPut(engine, req, resp);
-            case "delete" -> controller.processDelete(engine, req, resp);
-            case "connect" -> controller.processConnect(engine, req, resp);
-            case "options" -> controller.processOptions(engine, req, resp);
-            case "trace" -> controller.processTrace(engine, req, resp);
-            case "patch" -> controller.processPatch(engine, req, resp);
         }
     }
 

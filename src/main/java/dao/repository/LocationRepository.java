@@ -20,6 +20,7 @@ public class LocationRepository implements LocationDAO {
             session.beginTransaction();
 
             location = session.find(Location.class, id);
+            location.getUsers().iterator();
 
             session.getTransaction().commit();
         }catch(RuntimeException ex){
@@ -46,6 +47,8 @@ public class LocationRepository implements LocationDAO {
             query.setParameter("longitude", longitude);
 
             location = query.getSingleResult();
+            if(location != null)
+                location.getUsers().iterator();
         }catch (NoResultException nre){
             return Optional.empty();
         }catch(RuntimeException ex){
@@ -70,6 +73,8 @@ public class LocationRepository implements LocationDAO {
         try{
             query.setParameter("name", name);
             location = query.getSingleResult();
+            if(location != null)
+                location.getUsers().iterator();
         }catch (NoResultException nre){
             return Optional.empty();
         }catch (RuntimeException ex) {
@@ -80,24 +85,6 @@ public class LocationRepository implements LocationDAO {
         }
 
         return Optional.ofNullable(location);
-    }
-
-    @Override
-    public void save(Location entity) {
-        var session = HibernateUtility.getSessionFactory().openSession();
-
-        try{
-            session.beginTransaction();
-
-            session.persist(entity);
-
-            session.getTransaction().commit();
-        }catch(RuntimeException ex){
-            session.getTransaction().rollback();
-            ex.printStackTrace();
-        }finally {
-            session.close();
-        }
     }
 
     @Override

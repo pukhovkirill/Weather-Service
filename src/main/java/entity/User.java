@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Setter
@@ -29,5 +30,5 @@ public class User {
     private String publicKey;
 
     @ManyToMany(mappedBy = "users")
-    private Set<Location> locations;
+    private Set<Location> locations = new HashSet<>();
 }

@@ -15,6 +15,8 @@ public class ControllerMappings {
         controllerStorage.put("/", new HomeController());
         controllerStorage.put("/login", new LoginController());
         controllerStorage.put("/registration", new RegistrationController());
+        controllerStorage.put("/logout", new LogoutController());
+        controllerStorage.put("/search", new SearchController());
     }
 
     public static MappingController resolveControllerForRequest(final IWebRequest request) {

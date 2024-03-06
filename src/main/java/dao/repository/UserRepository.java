@@ -19,6 +19,8 @@ public class UserRepository implements UserDAO {
             session.beginTransaction();
 
             user = session.find(User.class, id);
+            if(user != null)
+                user.getLocations().iterator();
 
             session.getTransaction().commit();
         }catch(RuntimeException ex){
@@ -43,6 +45,8 @@ public class UserRepository implements UserDAO {
         try{
             query.setParameter("login", login);
             user = query.getSingleResult();
+            if(user != null)
+                user.getLocations().iterator();
         }catch (RuntimeException ex){
             ex.printStackTrace();
         }finally {
@@ -50,24 +54,6 @@ public class UserRepository implements UserDAO {
         }
 
         return Optional.ofNullable(user);
-    }
-
-    @Override
-    public void save(User entity) {
-        var session = HibernateUtility.getSessionFactory().openSession();
-
-        try{
-            session.beginTransaction();
-
-            session.persist(entity);
-
-            session.getTransaction().commit();
-        }catch(RuntimeException ex){
-            session.getTransaction().rollback();
-            ex.printStackTrace();
-        }finally {
-            session.close();
-        }
     }
 
     @Override

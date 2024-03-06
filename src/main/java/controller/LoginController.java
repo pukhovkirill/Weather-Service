@@ -26,8 +26,10 @@ public class LoginController extends AuthBaseController{
 
         var optionalSession = authorizationService.authorization(email, password);
 
-        if(optionalSession.isEmpty())
+        if(optionalSession.isEmpty()){
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
 
         var session = optionalSession.get();
 
