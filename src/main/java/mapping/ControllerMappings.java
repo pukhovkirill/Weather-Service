@@ -10,8 +10,8 @@ public class ControllerMappings {
 
     private static final Map<String, MappingController> controllerStorage;
 
-    static{
-        controllerStorage = new HashMap<>();
+    static {
+        controllerStorage  = new HashMap<>();
         controllerStorage.put("/", new HomeController());
         controllerStorage.put("/login", new LoginController());
         controllerStorage.put("/registration", new RegistrationController());

@@ -65,7 +65,7 @@ public class MapFilter implements Filter {
             }
         }
 
-        if(uri.startsWith("/img") || uri.startsWith("/icon")|| uri.startsWith("/template"))
+        if(uri.startsWith("/static/img") || uri.startsWith("/icon")|| uri.startsWith("/template"))
             return true;
             
         return false;

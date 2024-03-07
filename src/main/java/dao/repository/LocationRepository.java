@@ -88,28 +88,6 @@ public class LocationRepository implements LocationDAO {
     }
 
     @Override
-    public void update(Location entity) {
-        var session = HibernateUtility.getSessionFactory().openSession();
-
-        try{
-            session.beginTransaction();
-
-            var location = session.find(Location.class, entity.getId());
-            location.setName(entity.getName());
-            location.setUsers(entity.getUsers());
-            location.setLatitude(location.getLatitude());
-            location.setLongitude(location.getLongitude());
-
-            session.getTransaction().commit();
-        }catch(RuntimeException ex){
-            session.getTransaction().rollback();
-            ex.printStackTrace();
-        }finally {
-            session.close();
-        }
-    }
-
-    @Override
     public void delete(Long id) {
         var session = HibernateUtility.getSessionFactory().openSession();
 

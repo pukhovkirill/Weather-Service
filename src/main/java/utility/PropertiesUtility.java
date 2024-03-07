@@ -18,12 +18,19 @@ public class PropertiesUtility {
     private static void readApplicationProperties(){
         try{
             applicationProperties = new Properties();
-            var fis = new FileInputStream("/home/yukir/IdeaProjects/Weather-Service/src/main/resources/app.properties");
+            var fis = new FileInputStream(getResourcePath());
             applicationProperties.load(fis);
         }catch(FileNotFoundException ex){
             ex.printStackTrace();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static String getResourcePath(){
+        var url = PropertiesUtility.class.getClassLoader().getResource("app.properties");
+        if(url == null)
+            return "";
+        else return url.getPath();
     }
 }

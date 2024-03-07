@@ -1,5 +1,5 @@
 package controller;
 
-public class WeatherForecastController implements MappingController{
+public class WeatherForecastController extends BaseController{
 
 }

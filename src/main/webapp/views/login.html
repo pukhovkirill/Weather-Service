@@ -21,7 +21,7 @@
 </head>
 <body class="text-white bg-light">
   <div class="text-secondary px-4 py-5 text-center">
-    <div class="py-5">
+    <div class="pt-5">
       <div class="container w-25 m-auto bg-dark" style="border-radius: 20px; width: 850px; display: table; padding: 15px;">
         <form th:action="@{/login}" th:method="post">
           <svg class="bi my-5" width="100" height="100" role="img"><use xlink:href="#weather"></use></svg>
@@ -37,6 +37,11 @@
           <button class="btn btn-info w-75 py-2 my-2" type="submit">Sign in</button>
           <p class="mt-2 text-secondary">Don't have an account yet - <a href="/registration" class="link-info px-2" >Sign up</a></p>
         </form>
+      </div>
+    </div>
+    <div class="text-dark text-center mt-3" th:hidden="${is_auth_error}">
+      <div class="container w-25 m-auto bg-danger" style="border-radius: 20px; height: 60px">
+        <p class="pt-3" th:text="${error_message}">message</p>
       </div>
     </div>
   </div>

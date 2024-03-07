@@ -39,6 +39,11 @@
         </form>
       </div>
     </div>
+    <div class="text-dark text-center mt-3" th:hidden="${is_auth_error}">
+      <div class="container w-25 m-auto bg-danger" style="border-radius: 20px; height: 60px">
+        <p class="pt-3" th:text="${error_message}">message</p>
+      </div>
+    </div>
   </div>
 </body>
 </html>

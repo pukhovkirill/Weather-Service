@@ -1,5 +1,6 @@
 package dao;
 
+import entity.User;
 import utility.HibernateUtility;
 
 import java.util.Optional;
@@ -22,6 +23,21 @@ public interface BaseDAO<T> {
             session.close();
         }
     }
-    void update(T entity);
+    default void update(T entity){
+        var session = HibernateUtility.getSessionFactory().openSession();
+
+        try{
+            session.beginTransaction();
+
+            session.merge(entity);
+
+            session.getTransaction().commit();
+        }catch(RuntimeException ex){
+            session.getTransaction().rollback();
+            ex.printStackTrace();
+        }finally {
+            session.close();
+        }
+    }
     void delete(Long id);
 }

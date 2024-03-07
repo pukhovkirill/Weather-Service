@@ -62,26 +62,6 @@ public class SessionRepository implements SessionDAO {
     }
 
     @Override
-    public void update(Session entity) {
-        var session = HibernateUtility.getSessionFactory().openSession();
-
-        try{
-            session.beginTransaction();
-
-            var userSession = session.find(Session.class, entity.getUuid());
-            userSession.setUser(entity.getUser());
-            userSession.setExpiresAt(entity.getExpiresAt());
-
-            session.getTransaction().commit();
-        }catch(RuntimeException ex){
-            session.getTransaction().rollback();
-            ex.printStackTrace();
-        }finally {
-            session.close();
-        }
-    }
-
-    @Override
     public void delete(UUID uuid) {
         var session = HibernateUtility.getSessionFactory().openSession();
 

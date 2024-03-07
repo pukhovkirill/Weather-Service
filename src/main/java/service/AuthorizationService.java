@@ -9,6 +9,7 @@ import utility.PropertiesUtility;
 
 import java.sql.Timestamp;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Optional;
 
 public class AuthorizationService {
@@ -24,7 +25,10 @@ public class AuthorizationService {
         this.sessionLifetime = Long.valueOf(PropertiesUtility.getApplicationProperty("app.session_lifetime"));
     }
 
-    public void registration(String login, String password){
+    public boolean registration(String login, String password){
+        if(userRepository.findByLogin(login).isPresent())
+            return false;
+
         var publicKey = encryptionService.generateKey();
         var salt = encryptionService.hash(publicKey);
 
@@ -35,9 +39,11 @@ public class AuthorizationService {
         user.setPassword(hashedPassword);
         user.setPublicKey(publicKey);
 
-        user.setLocations(new HashSet<>());
+        user.setLocations(new LinkedList<>());
 
         userRepository.save(user);
+
+        return true;
     }
 
     public Optional<Session> authorization(String login, String password){

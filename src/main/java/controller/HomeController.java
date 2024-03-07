@@ -1,23 +1,26 @@
 package controller;
 
 import dao.repository.LocationRepository;
+import dao.repository.UserRepository;
 import entity.User;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
 import org.thymeleaf.context.WebContext;
 import service.LocationsManageService;
 import service.WeatherApiClientService;
 import service.weather.CurrentWeather;
 import service.weather.factory.OpenWeatherFactory;
 
-import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.LinkedList;
 import java.util.List;
 
-public class HomeController implements MappingController{
-    private static final String IS_USER_AUTHORIZED_VARIABLE = "is_user_authorized";
-    private static final String USERS_WEATHER_FORECASTS = "forecasts";
+public class HomeController extends BaseController{
+    protected static final String USERS_WEATHER_FORECASTS = "forecasts";
 
     private final WeatherApiClientService weatherService;
     private final LocationsManageService locationsManageService;
@@ -26,29 +29,21 @@ public class HomeController implements MappingController{
         final var weatherFactory = new OpenWeatherFactory();
         this.weatherService = new WeatherApiClientService(weatherFactory);
 
+        final var userDao = new UserRepository();
         final var locationDao = new LocationRepository();
-        this.locationsManageService = new LocationsManageService(locationDao);
+        this.locationsManageService = new LocationsManageService(userDao, locationDao);
     }
 
 
     @Override
     public void processGet(ThymeleafTemplateEngine engine, HttpServletRequest req, HttpServletResponse resp) throws Exception {
         if(isUserAuthorized(req))
-            authorizedProcess(engine, req, resp);
+            authorizedProcess(engine, req);
         else
-            unauthorizedProcess(engine, req, resp);
+            unauthorizedProcess(engine);
     }
 
-    @Override
-    public void processPost(ThymeleafTemplateEngine engine, HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        if(isUserAuthorized(req)){
-            searchProcess(req, resp);
-            return;
-        }
-        resp.sendError(HttpServletResponse.SC_FORBIDDEN, "To use search you must log in");
-    }
-
-    private void authorizedProcess(ThymeleafTemplateEngine engine, HttpServletRequest req, HttpServletResponse resp){
+    private void authorizedProcess(ThymeleafTemplateEngine engine, HttpServletRequest req){
         var templateEngine = engine.getTemplateEngine();
         var webExchange = engine.getWebExchange();
         var writer = engine.getWriter();
@@ -58,13 +53,13 @@ public class HomeController implements MappingController{
         var session = req.getSession();
         var user = (User) session.getAttribute("user");
 
-        var forecasts = foundUsersWeatherForecasts(user);
+        var forecasts = foundUsersWeatherForecasts(user.getId());
 
         setVariables(ctx, true, forecasts);
         templateEngine.process("index", ctx, writer);
     }
 
-    private void unauthorizedProcess(ThymeleafTemplateEngine engine, HttpServletRequest req, HttpServletResponse resp){
+    private void unauthorizedProcess(ThymeleafTemplateEngine engine){
         var templateEngine = engine.getTemplateEngine();
         var webExchange = engine.getWebExchange();
         var writer = engine.getWriter();
@@ -75,37 +70,62 @@ public class HomeController implements MappingController{
         templateEngine.process("index", ctx, writer);
     }
 
-    private void searchProcess(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-        var wantedLocation = req.getParameter("wanted");
+    private List<ReducedCurrentWeather> foundUsersWeatherForecasts(Long id){
+        List<ReducedCurrentWeather> forecasts = new LinkedList<>();
 
-        if(wantedLocation == null){
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Location not found");
-            return;
-        }
-
-        resp.sendRedirect(String.format("/search?wanted=%s", wantedLocation));
-    }
-
-    private void setVariables(WebContext ctx, boolean isUserAuthorized, List<CurrentWeather> forecasts){
-        ctx.setVariable(IS_USER_AUTHORIZED_VARIABLE, isUserAuthorized);
-        ctx.setVariable(USERS_WEATHER_FORECASTS, forecasts);
-    }
-
-    private boolean isUserAuthorized(HttpServletRequest req){
-        var session = req.getSession();
-        return session.getAttribute("user") != null;
-    }
-
-    private List<CurrentWeather> foundUsersWeatherForecasts(User user){
-        List<CurrentWeather> forecasts = new LinkedList<>();
-
-        var locations = this.locationsManageService.getUserFavoritesLocations(user);
+        var locations = this.locationsManageService.getUserFavoritesLocations(id);
 
         for(var location : locations){
             var forecast = this.weatherService.getCurrentWeather(location);
-            forecasts.add(forecast);
+            var reduceForecast = new ReducedCurrentWeather();
+            reduceForecast.fillReduce(forecast);
+            forecasts.add(reduceForecast);
         }
 
         return forecasts;
+    }
+
+    protected void setVariables(WebContext ctx, boolean isUserAuthorized, List<ReducedCurrentWeather> forecast) {
+        super.setVariables(ctx, isUserAuthorized);
+        ctx.setVariable(USERS_WEATHER_FORECASTS, forecast);
+    }
+
+    @Getter
+    public static class ReducedCurrentWeather{
+        private String name;
+        private Timestamp date;
+        private double temperature;
+        private double feelsLikeTemp;
+        private String state;
+        private double tempMin;
+        private double tempMax;
+        private int clouds;
+        private int humidity;
+        private int windDeg;
+        private double windSpeed;
+        private double pressure;
+        private Timestamp sunrise;
+        private Timestamp sunset;
+
+        public void fillReduce(CurrentWeather weather){
+            var weatherDt = LocalDateTime.ofInstant(Instant.ofEpochSecond(weather.getDt()), ZoneId.systemDefault());
+            var weatherSunrise = LocalDateTime.ofInstant(Instant.ofEpochSecond(weather.getSys().getSunrise()), ZoneId.systemDefault());
+            var weatherSunset = LocalDateTime.ofInstant(Instant.ofEpochSecond(weather.getSys().getSunset()), ZoneId.systemDefault());
+
+            this.name = weather.getName();
+            this.date = Timestamp.valueOf(weatherDt);
+            this.temperature = weather.getMain().getTemp();
+            this.feelsLikeTemp = weather.getMain().getFeelsLike();
+            this.state = weather.getWeather().getFirst().getMain();
+            this.tempMin = weather.getMain().getTempMin();
+            this.tempMax = weather.getMain().getTempMax();
+            this.clouds = weather.getClouds().getAll();
+            this.humidity = weather.getMain().getHumidity();
+            this.windDeg = weather.getWind().getDeg();
+            this.windSpeed = weather.getWind().getSpeed();
+            this.pressure = weather.getMain().getPressure();
+            this.sunrise = Timestamp.valueOf(weatherSunrise);
+            this.sunset = Timestamp.valueOf(weatherSunset);
+        }
     }
 }

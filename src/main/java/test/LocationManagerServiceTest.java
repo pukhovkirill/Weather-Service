@@ -1,6 +1,7 @@
 package test;
 
 import dao.repository.LocationRepository;
+import dao.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.LocationsManageService;
@@ -12,8 +13,9 @@ public class LocationManagerServiceTest {
 
     @BeforeEach
     void init(){
+        var userRepository = new UserRepository();
         var locationRepository = new LocationRepository();
-        this.locationsManageService = new LocationsManageService(locationRepository);
+        this.locationsManageService = new LocationsManageService(userRepository, locationRepository);
     }
 
     @Test

@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Setter
@@ -29,6 +31,11 @@ public class User {
     @Column(name = "public_key", nullable = false)
     private String publicKey;
 
-    @ManyToMany(mappedBy = "users")
-    private Set<Location> locations = new HashSet<>();
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "users_to_locations",
+            joinColumns = { @JoinColumn(name = "user_id", referencedColumnName="id") },
+            inverseJoinColumns = { @JoinColumn(name = "location_id", referencedColumnName="id") }
+    )
+    private List<Location> locations;
 }

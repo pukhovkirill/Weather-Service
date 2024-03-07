@@ -15,6 +15,7 @@ import utility.PropertiesUtility;
 public class OpenWeatherFactory implements WeatherFactory{
     private final String apiKey;
     private final String uri;
+    private final String units = "metric";
 
     public OpenWeatherFactory(){
         this.apiKey = PropertiesUtility.getApplicationProperty("weather.ow_api");
@@ -58,6 +59,7 @@ public class OpenWeatherFactory implements WeatherFactory{
                         .queryString("lat", latitude)
                         .queryString("lon", longitude)
                         .queryString("appid", apiKey)
+                        .queryString("units", units)
                         .asJson();
 
         var objectMapper = new ObjectMapper();
@@ -74,6 +76,7 @@ public class OpenWeatherFactory implements WeatherFactory{
                         .queryString("lat", latitude)
                         .queryString("lon", longitude)
                         .queryString("appid", apiKey)
+                        .queryString("units", units)
                         .asJson();
 
         var objectMapper = new ObjectMapper();

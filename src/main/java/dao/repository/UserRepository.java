@@ -57,26 +57,6 @@ public class UserRepository implements UserDAO {
     }
 
     @Override
-    public void update(User entity) {
-        var session = HibernateUtility.getSessionFactory().openSession();
-
-        try{
-            session.beginTransaction();
-
-            var user = session.find(User.class, entity.getId());
-            user.setLogin(entity.getLogin());
-            user.setPassword(entity.getPassword());
-
-            session.getTransaction().commit();
-        }catch(RuntimeException ex){
-            session.getTransaction().rollback();
-            ex.printStackTrace();
-        }finally {
-            session.close();
-        }
-    }
-
-    @Override
     public void delete(Long id) {
         var session = HibernateUtility.getSessionFactory().openSession();
 

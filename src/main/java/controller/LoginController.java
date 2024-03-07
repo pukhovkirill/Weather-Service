@@ -4,8 +4,11 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.thymeleaf.context.WebContext;
+import utility.PropertiesUtility;
 
 public class LoginController extends AuthBaseController{
+    private static final int COOKIE_LIFETIME =
+            Integer.parseInt(PropertiesUtility.getApplicationProperty("app.cookie_lifetime"));
 
     @Override
     public void processGet(ThymeleafTemplateEngine engine, HttpServletRequest req, HttpServletResponse resp) throws Exception {
@@ -14,6 +17,8 @@ public class LoginController extends AuthBaseController{
         var writer = engine.getWriter();
 
         WebContext ctx = new WebContext(webExchange, webExchange.getLocale());
+
+        errorCheck(ctx, req);
 
         templateEngine.process("login", ctx, writer);
     }
@@ -27,7 +32,8 @@ public class LoginController extends AuthBaseController{
         var optionalSession = authorizationService.authorization(email, password);
 
         if(optionalSession.isEmpty()){
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            setError(req, "Incorrect login or password. Please try again");
+            resp.sendRedirect("/login");
             return;
         }
 
@@ -40,6 +46,7 @@ public class LoginController extends AuthBaseController{
         httpSession.setAttribute("expires_at", session.getExpiresAt());
 
         var cookie = new Cookie("acc", String.valueOf(session.getUser().getId()));
+        cookie.setMaxAge(COOKIE_LIFETIME);
 
         resp.addCookie(cookie);
 

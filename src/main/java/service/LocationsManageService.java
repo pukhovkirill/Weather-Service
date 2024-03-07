@@ -1,19 +1,20 @@
 package service;
 
 import dao.LocationDAO;
+import dao.UserDAO;
+import dao.repository.UserRepository;
 import entity.Location;
-import entity.User;
 import model.Coordinates;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public class LocationsManageService {
+    private final UserDAO userRepository;
     private final LocationDAO locationRepository;
     private final GeoLocationService geoLocationService;
 
-    public LocationsManageService(LocationDAO locationRepository){
+    public LocationsManageService(UserRepository userRepository, LocationDAO locationRepository){
+        this.userRepository = userRepository;
         this.locationRepository = locationRepository;
         this.geoLocationService = new GeoLocationService();
     }
@@ -30,13 +31,12 @@ public class LocationsManageService {
         if(optionalLocation.isEmpty()){
             location = new Location();
             location.setName(coordinates.getName());
-            location.setUsers(new HashSet<>());
+            location.setUsers(new LinkedList<>());
             location.setLatitude(coordinates.getLatitude());
             location.setLongitude(coordinates.getLongitude());
 
             locationRepository.save(location);
-
-            return Optional.of(location);
+            return locationRepository.findByCoordinates(coordinates.getLatitude(), coordinates.getLongitude());
         }else{
             return optionalLocation;
         }
@@ -46,14 +46,32 @@ public class LocationsManageService {
         return this.geoLocationService.findCoordinatesByName(name);
     }
 
-    //todo: check this code
-    public void addLocationToUsersFavorites(Location location, User user){
-        location.getUsers().add(user);
+    public void addLocationToUsersFavorites(Long id, Location location){
+        var actualUser = this.userRepository.find(id);
+
+        if(actualUser.isEmpty())
+            return;
+
+        var user = actualUser.get();
+
+        if(user.getLocations().stream().anyMatch(x -> Objects.equals(x.getId(), location.getId()))) {
+            return;
+        }
+
         user.getLocations().add(location);
+
+        this.userRepository.update(user);
     }
 
-    //todo: check this code
-    public Set<Location> getUserFavoritesLocations(User user){
+    public Collection<Location> getUserFavoritesLocations(Long id){
+        var actualUser = this.userRepository.find(id);
+
+        if(actualUser.isEmpty())
+            return null;
+
+        var user = actualUser.get();
+
         return user.getLocations();
     }
+
 }

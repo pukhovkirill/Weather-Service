@@ -34,7 +34,7 @@ public class GeoLocationService {
         try {
             coordinates = objectMapper.readValue(json, Coordinates[].class);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            coordinates = new Coordinates[0];
         }
 
         return coordinates;

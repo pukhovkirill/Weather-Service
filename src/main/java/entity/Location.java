@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Setter
@@ -23,17 +25,12 @@ public class Location {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "locations_to_users",
-            joinColumns = { @JoinColumn(name = "user_id") },
-            inverseJoinColumns = { @JoinColumn(name = "location_id") }
-    )
-    private Set<User> users = new HashSet<>();
-
     @Column(name = "latitude", nullable = false, unique = true)
     private Double latitude;
 
     @Column(name = "longitude", nullable = false, unique = true)
     private Double longitude;
+
+    @ManyToMany(mappedBy = "locations")
+    private List<User> users;
 }

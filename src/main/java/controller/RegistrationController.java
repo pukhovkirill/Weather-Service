@@ -14,6 +14,8 @@ public class RegistrationController extends AuthBaseController{
 
         WebContext ctx = new WebContext(webExchange, webExchange.getLocale());
 
+        errorCheck(ctx, req);
+
         templateEngine.process("registration", ctx, writer);
     }
 
@@ -23,7 +25,10 @@ public class RegistrationController extends AuthBaseController{
         var email = req.getParameter("email");
         var password = req.getParameter("password");
 
-        authorizationService.registration(email, password);
+        if(!authorizationService.registration(email, password)){
+            setError(req, "This user already exists");
+            return;
+        }
         resp.sendRedirect("/login");
     }
 

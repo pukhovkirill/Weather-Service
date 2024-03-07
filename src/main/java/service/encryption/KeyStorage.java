@@ -16,8 +16,7 @@ public class KeyStorage {
     private static final String keyStoragePassword =
             PropertiesUtility.getApplicationProperty("app.key_storage_password");
 
-    private static final String KEY_STORAGE_PATH =
-            PropertiesUtility.getApplicationProperty("app.key_storage_path");
+    private static final String KEY_STORAGE_PATH = getResourcePath();
 
     public static void storingIntoKeyStore(String key, String alias){
         try {
@@ -64,5 +63,12 @@ public class KeyStorage {
                  IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static String getResourcePath(){
+        var url = KeyStorage.class.getClassLoader().getResource("key_storage.jceks");
+        if(url == null)
+            return "";
+        else return url.getPath();
     }
 }
