@@ -10,6 +10,8 @@ import org.thymeleaf.context.WebContext;
 import service.LocationsManageService;
 import service.WeatherApiClientService;
 import service.weather.CurrentWeather;
+import service.weather.enums.TimeOfDay;
+import service.weather.enums.WeatherCondition;
 import service.weather.factory.OpenWeatherFactory;
 
 import java.sql.Timestamp;
@@ -94,9 +96,11 @@ public class HomeController extends BaseController{
     public static class ReducedCurrentWeather{
         private String name;
         private Timestamp date;
+        private TimeOfDay timeOfDay;
         private double temperature;
         private double feelsLikeTemp;
         private String state;
+        private WeatherCondition condition;
         private double tempMin;
         private double tempMax;
         private int clouds;
@@ -114,9 +118,11 @@ public class HomeController extends BaseController{
 
             this.name = weather.getName();
             this.date = Timestamp.valueOf(weatherDt);
+            this.timeOfDay = TimeOfDay.getTimeOfDayForTime(weatherDt);
             this.temperature = weather.getMain().getTemp();
             this.feelsLikeTemp = weather.getMain().getFeelsLike();
             this.state = weather.getWeather().getFirst().getMain();
+            this.condition = WeatherCondition.getWeatherConditionForCode(weather.getWeather().getFirst().getId());
             this.tempMin = weather.getMain().getTempMin();
             this.tempMax = weather.getMain().getTempMax();
             this.clouds = weather.getClouds().getAll();

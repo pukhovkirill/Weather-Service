@@ -13,7 +13,7 @@ import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.IWebApplication;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
-import java.io.IOException;
+import java.io.*;
 
 public class MapFilter implements Filter {
 
@@ -29,6 +29,7 @@ public class MapFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        gettingStaticResources((HttpServletRequest) servletRequest, (HttpServletResponse) servletResponse);
         process((HttpServletRequest) servletRequest, (HttpServletResponse) servletResponse);
     }
 
@@ -64,15 +65,50 @@ public class MapFilter implements Filter {
                 return true;
             }
         }
-
-        if(uri.startsWith("/static/img") || uri.startsWith("/icon")|| uri.startsWith("/template"))
-            return true;
             
         return false;
     }
 
+
+    private void gettingStaticResources(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+       var uri =  req.getRequestURI();
+       var uriParts = uri.split("/");
+
+       if(uri.contains("/img")){
+           resp.setContentType("text/html; charset=UTF-8");
+           resp.setHeader("Pragma", "no-cache");
+           resp.setHeader("Cache-Control", "no-cache");
+           resp.setDateHeader("Expires", 0);
+
+           final var context = req.getServletContext();
+           var fileUri = MapFilter.class.getResource("/img/"+uriParts[uriParts.length-1]);
+           if(fileUri == null)
+               return;
+
+           var imagePath = fileUri.getPath();
+           var mime = context.getMimeType(imagePath);
+           if(mime == null)
+               return;
+
+           resp.setContentType(mime);
+           File file = new File(imagePath);
+           resp.setContentLength((int)file.length());
+
+           FileInputStream in = new FileInputStream(file);
+           OutputStream out = resp.getOutputStream();
+
+           byte[] buf = new byte[1024];
+           int count;
+           while((count = in.read(buf)) >= 0){
+               out.write(buf, 0, count);
+           }
+           out.close();
+           in.close();
+       }
+    }
+
     private void setRequiredHeaders(HttpServletResponse resp){
-        resp.setContentType("text/html;charset=UTF-8");
+        resp.setContentType("text/html; charset=UTF-8");
         resp.setHeader("Pragma", "no-cache");
         resp.setHeader("Cache-Control", "no-cache");
         resp.setDateHeader("Expires", 0);
