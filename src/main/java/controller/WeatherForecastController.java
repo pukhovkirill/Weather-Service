@@ -10,7 +10,8 @@ import service.WeatherApiClientService;
 import service.weather.DailyWeather;
 import service.weather.enums.TimeOfDay;
 import service.weather.enums.WeatherCondition;
-import service.weather.factory.OpenWeatherFactory;
+import service.weather.factory.FactoryManager;
+import utility.PropertiesUtility;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -25,7 +26,8 @@ public class WeatherForecastController extends BaseController{
     private final LocationDAO locationDAO;
 
     public WeatherForecastController(){
-        final var weatherFactory = new OpenWeatherFactory();
+        String factoryProvider = PropertiesUtility.getApplicationProperty("weather.weather_provider");
+        final var weatherFactory = FactoryManager.getWeatherProvider(factoryProvider);
         this.weatherService = new WeatherApiClientService(weatherFactory);
 
         this.locationDAO = new LocationRepository();

@@ -12,7 +12,8 @@ import service.WeatherApiClientService;
 import service.weather.CurrentWeather;
 import service.weather.enums.TimeOfDay;
 import service.weather.enums.WeatherCondition;
-import service.weather.factory.OpenWeatherFactory;
+import service.weather.factory.FactoryManager;
+import utility.PropertiesUtility;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -28,7 +29,8 @@ public class HomeController extends BaseController{
     private final LocationsManageService locationsManageService;
 
     public HomeController(){
-        final var weatherFactory = new OpenWeatherFactory();
+        String weatherProvider = PropertiesUtility.getApplicationProperty("weather.weather_provider");
+        final var weatherFactory = FactoryManager.getWeatherProvider(weatherProvider);
         this.weatherService = new WeatherApiClientService(weatherFactory);
 
         final var userDao = new UserRepository();

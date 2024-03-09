@@ -28,14 +28,6 @@ public class OpenWeatherFactory implements WeatherFactory{
     }
 
     @Override
-    public WeatherForecast getWeatherForecast(String locationName) {
-        var geoService = new GeoLocationService();
-        var coordinates = geoService.findFirstCoordinateByName(locationName);
-
-        return getWeatherForecast(coordinates.getLatitude(), coordinates.getLongitude());
-    }
-
-    @Override
     public WeatherForecast getWeatherForecast(double latitude, double longitude) {
         WeatherForecast forecast = new WeatherForecast();
         try {

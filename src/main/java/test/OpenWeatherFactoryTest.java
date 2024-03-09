@@ -9,6 +9,5 @@ public class OpenWeatherFactoryTest {
     @Test
     void getWeatherForecastTest(){
         var factory = new OpenWeatherFactory();
-        factory.getWeatherForecast("London");
     }
 }
