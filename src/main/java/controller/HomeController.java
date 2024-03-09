@@ -72,6 +72,12 @@ public class HomeController extends BaseController{
         templateEngine.process("index", ctx, writer);
     }
 
+    protected void setVariables(WebContext ctx, boolean isUserAuthorized, List<ReducedCurrentWeather> forecast) {
+        super.setVariables(ctx, isUserAuthorized);
+        ctx.setVariable(USERS_WEATHER_FORECASTS, forecast);
+    }
+
+
     private List<ReducedCurrentWeather> foundUsersWeatherForecasts(Long id){
         List<ReducedCurrentWeather> forecasts = new LinkedList<>();
 
@@ -80,20 +86,16 @@ public class HomeController extends BaseController{
         for(var location : locations){
             var forecast = this.weatherService.getCurrentWeather(location);
             var reduceForecast = new ReducedCurrentWeather();
-            reduceForecast.fillReduce(forecast);
+            reduceForecast.fillReduce(location.getId(), forecast);
             forecasts.add(reduceForecast);
         }
 
         return forecasts;
     }
 
-    protected void setVariables(WebContext ctx, boolean isUserAuthorized, List<ReducedCurrentWeather> forecast) {
-        super.setVariables(ctx, isUserAuthorized);
-        ctx.setVariable(USERS_WEATHER_FORECASTS, forecast);
-    }
-
     @Getter
     public static class ReducedCurrentWeather{
+        private Long locationId;
         private String name;
         private Timestamp date;
         private TimeOfDay timeOfDay;
@@ -110,8 +112,12 @@ public class HomeController extends BaseController{
         private double pressure;
         private Timestamp sunrise;
         private Timestamp sunset;
+        private Double latitude;
+        private Double longitude;
 
-        public void fillReduce(CurrentWeather weather){
+        public void fillReduce(Long locationId, CurrentWeather weather){
+            this.locationId = locationId;
+
             var weatherDt = LocalDateTime.ofInstant(Instant.ofEpochSecond(weather.getDt()), ZoneId.systemDefault());
             var weatherSunrise = LocalDateTime.ofInstant(Instant.ofEpochSecond(weather.getSys().getSunrise()), ZoneId.systemDefault());
             var weatherSunset = LocalDateTime.ofInstant(Instant.ofEpochSecond(weather.getSys().getSunset()), ZoneId.systemDefault());
@@ -132,6 +138,9 @@ public class HomeController extends BaseController{
             this.pressure = weather.getMain().getPressure();
             this.sunrise = Timestamp.valueOf(weatherSunrise);
             this.sunset = Timestamp.valueOf(weatherSunset);
+
+            this.latitude = weather.getCoord().getLat();
+            this.longitude = weather.getCoord().getLon();
         }
     }
 }

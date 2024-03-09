@@ -28,6 +28,10 @@
         <location>/views/404_error_page_option.html</location>
     </error-page>
     <error-page>
+        <error-code>403</error-code>
+        <location>/views/403_error_page_option.html</location>
+    </error-page>
+    <error-page>
         <error-code>500</error-code>
         <location>/views/500_error_page_option.html</location>
     </error-page>

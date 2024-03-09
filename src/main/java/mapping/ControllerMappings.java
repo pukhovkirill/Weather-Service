@@ -17,6 +17,7 @@ public class ControllerMappings {
         controllerStorage.put("/registration", new RegistrationController());
         controllerStorage.put("/logout", new LogoutController());
         controllerStorage.put("/search", new SearchController());
+        controllerStorage.put("/forecast", new WeatherForecastController());
     }
 
     public static MappingController resolveControllerForRequest(final IWebRequest request) {

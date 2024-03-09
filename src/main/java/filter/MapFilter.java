@@ -65,6 +65,13 @@ public class MapFilter implements Filter {
                 return true;
             }
         }
+
+        if(req.getSession().getAttribute("user") == null){
+            if(uri.startsWith("/search") || uri.startsWith("/forecast")){
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return true;
+            }
+        }
             
         return false;
     }

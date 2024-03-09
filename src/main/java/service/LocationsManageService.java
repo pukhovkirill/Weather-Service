@@ -13,7 +13,7 @@ public class LocationsManageService {
     private final LocationDAO locationRepository;
     private final GeoLocationService geoLocationService;
 
-    public LocationsManageService(UserRepository userRepository, LocationDAO locationRepository){
+    public LocationsManageService(UserDAO userRepository, LocationDAO locationRepository){
         this.userRepository = userRepository;
         this.locationRepository = locationRepository;
         this.geoLocationService = new GeoLocationService();
