@@ -6,7 +6,6 @@ import entity.Location;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
-import service.GeoLocationService;
 import service.weather.CurrentWeather;
 import service.weather.DailyWeather;
 import service.weather.WeatherForecast;

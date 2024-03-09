@@ -2,7 +2,6 @@ package service;
 
 import dao.LocationDAO;
 import dao.UserDAO;
-import dao.repository.UserRepository;
 import entity.Location;
 import model.Coordinates;
 
@@ -74,4 +73,23 @@ public class LocationsManageService {
         return user.getLocations();
     }
 
+    public boolean removeUserFavoritesLocation(Long id, Long locationId){
+        var actualUser = this.userRepository.find(id);
+
+        if(actualUser.isEmpty())
+            return false;
+
+        var user = actualUser.get();
+        var locationOptional = user.getLocations().stream().filter(x -> Objects.equals(x.getId(), locationId)).findFirst();
+
+        if(locationOptional.isEmpty())
+            return false;
+
+        var location = locationOptional.get();
+
+        user.getLocations().remove(location);
+
+        this.userRepository.update(user);
+        return true;
+    }
 }

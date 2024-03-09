@@ -50,12 +50,12 @@ public class WeatherForecastController extends BaseController{
             return;
         }
 
-        setVariables(ctx, true, dailyWeather);
+        setVariables(ctx, dailyWeather);
         templateEngine.process("forecast", ctx, writer);
     }
 
-    protected void setVariables(WebContext ctx, boolean isUserAuthorized, ReducedWeather forecast) {
-        super.setVariables(ctx, isUserAuthorized);
+    protected void setVariables(WebContext ctx, ReducedWeather forecast) {
+        super.setVariables(ctx, true);
         ctx.setVariable(USERS_WEATHER_FORECASTS, forecast);
     }
 

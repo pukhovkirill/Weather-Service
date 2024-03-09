@@ -1,6 +1,5 @@
 package dao;
 
-import entity.User;
 import utility.HibernateUtility;
 
 import java.util.Optional;

@@ -28,16 +28,16 @@ public class AuthFilter implements Filter {
     private AuthorizationService authorizationService;
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
         this.authorizationService = buildEncryptionService();
     }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException {
         authorizationCheck(servletRequest, servletResponse, filterChain);
     }
 
-    private void authorizationCheck(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws ServletException, IOException {
+    private void authorizationCheck(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException {
         final var req = (HttpServletRequest) servletRequest;
         final var resp = (HttpServletResponse) servletResponse;
 
@@ -81,18 +81,11 @@ public class AuthFilter implements Filter {
         return Arrays.stream(req.getCookies()).filter(x -> x.getName().equals(COOKIE_NAME)).findFirst();
     }
 
-    private Optional<Session> getUserSession(String userId, HttpServletRequest req){
+    private Optional<Session> getUserSession(String uuid, HttpServletRequest req){
         var sessionFromHttp = seeCurrentSession(req);
-
-        if(sessionFromHttp.isPresent()){
-            return sessionFromHttp;
-        }else{
-            if(userId == null)
-                return Optional.empty();
-
-            Long id = Long.parseLong(userId);
-            return this.authorizationService.findSessionByUserId(id);
-        }
+        return sessionFromHttp.isPresent()
+                ? sessionFromHttp
+                : this.authorizationService.findSessionByUUID(UUID.fromString(uuid));
     }
 
     private Optional<Session> seeCurrentSession(HttpServletRequest req){

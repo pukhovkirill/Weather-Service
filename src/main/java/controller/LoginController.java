@@ -11,7 +11,7 @@ public class LoginController extends AuthBaseController{
             Integer.parseInt(PropertiesUtility.getApplicationProperty("app.cookie_lifetime"));
 
     @Override
-    public void processGet(ThymeleafTemplateEngine engine, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public void processGet(ThymeleafTemplateEngine engine, HttpServletRequest req, HttpServletResponse resp) {
         var templateEngine = engine.getTemplateEngine();
         var webExchange = engine.getWebExchange();
         var writer = engine.getWriter();
@@ -45,7 +45,7 @@ public class LoginController extends AuthBaseController{
         httpSession.setAttribute("user", session.getUser());
         httpSession.setAttribute("expires_at", session.getExpiresAt());
 
-        var cookie = new Cookie("acc", String.valueOf(session.getUser().getId()));
+        var cookie = new Cookie("acc", session.getUuid().toString());
         cookie.setMaxAge(COOKIE_LIFETIME);
 
         resp.addCookie(cookie);

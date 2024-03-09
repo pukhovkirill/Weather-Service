@@ -21,20 +21,20 @@ public class MapFilter implements Filter {
     private JakartaServletWebApplication application;
 
     @Override
-    public void init(final FilterConfig filterConfig) throws ServletException {
+    public void init(final FilterConfig filterConfig) {
         this.application =
                 JakartaServletWebApplication.buildApplication(filterConfig.getServletContext());
         this.templateEngine = buildTemplateEngine(this.application);
     }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException {
         gettingStaticResources((HttpServletRequest) servletRequest, (HttpServletResponse) servletResponse);
         process((HttpServletRequest) servletRequest, (HttpServletResponse) servletResponse);
     }
 
     private void process(final HttpServletRequest request, final HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
         try{
             if(isForbiddenUri(request, response))
                 return;

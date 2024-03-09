@@ -7,7 +7,7 @@ import org.thymeleaf.context.WebContext;
 public class RegistrationController extends AuthBaseController{
 
     @Override
-    public void processGet(ThymeleafTemplateEngine engine, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public void processGet(ThymeleafTemplateEngine engine, HttpServletRequest req, HttpServletResponse resp) {
         var templateEngine = engine.getTemplateEngine();
         var webExchange = engine.getWebExchange();
         var writer = engine.getWriter();

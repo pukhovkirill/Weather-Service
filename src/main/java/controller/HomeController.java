@@ -40,11 +40,34 @@ public class HomeController extends BaseController{
 
 
     @Override
-    public void processGet(ThymeleafTemplateEngine engine, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    public void processGet(ThymeleafTemplateEngine engine, HttpServletRequest req, HttpServletResponse resp) {
         if(isUserAuthorized(req))
             authorizedProcess(engine, req);
         else
             unauthorizedProcess(engine);
+    }
+
+    @Override
+    public void processPost(ThymeleafTemplateEngine engine, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        var location = req.getParameter("location_id");
+
+        if(location == null || location.isBlank()){
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Location not found");
+            return;
+        }
+
+        var locationId = Long.parseLong(location);
+        var session = req.getSession();
+        var user = (User) session.getAttribute("user");
+
+        var result = locationsManageService.removeUserFavoritesLocation(user.getId(), locationId);
+
+        if(!result){
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }
+
+        resp.sendRedirect("/");
     }
 
     private void authorizedProcess(ThymeleafTemplateEngine engine, HttpServletRequest req){

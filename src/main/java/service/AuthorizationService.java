@@ -8,9 +8,9 @@ import service.encryption.EncryptionService;
 import utility.PropertiesUtility;
 
 import java.sql.Timestamp;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Optional;
+import java.util.UUID;
 
 public class AuthorizationService {
     private final UserDAO userRepository;
@@ -79,17 +79,8 @@ public class AuthorizationService {
         return session;
     }
 
-    public Optional<Session> findSessionByUserId(Long id){
-         var user = this.userRepository.find(id);
-
-         if(user.isEmpty())
-             return Optional.empty();
-
-         return findSession(user.get());
-    }
-
-    private Optional<Session> findSession(User user){
-        var optionalSession = sessionRepository.findByUser(user);
+    public Optional<Session> findSessionByUUID(UUID uuid){
+        var optionalSession = sessionRepository.find(uuid);
 
         if(optionalSession.isEmpty())
             return Optional.empty();
@@ -107,8 +98,27 @@ public class AuthorizationService {
         return optionalSession;
     }
 
-    public boolean logout(User user){
-        var session = findSession(user);
+    private Optional<Session> findSession(UUID uuid){
+        var optionalSession = sessionRepository.find(uuid);
+
+        if(optionalSession.isEmpty())
+            return Optional.empty();
+
+        var session = optionalSession.get();
+
+        var expiresAt = session.getExpiresAt();
+        var current = new Timestamp(System.currentTimeMillis());
+
+        if (current.compareTo(expiresAt) > 0) {
+            sessionRepository.delete(session.getUuid());
+            return Optional.empty();
+        }
+
+        return optionalSession;
+    }
+
+    public boolean logout(UUID uuid){
+        var session = findSession(uuid);
 
         if(session.isEmpty())
             return false;
