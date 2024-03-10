@@ -1,5 +1,7 @@
 package service.weather.factory;
 
+import service.weather.factory.OpenWeather.OpenWeatherFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 

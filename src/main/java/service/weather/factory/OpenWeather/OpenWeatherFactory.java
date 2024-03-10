@@ -1,4 +1,4 @@
-package service.weather.factory;
+package service.weather.factory.OpenWeather;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,12 +6,13 @@ import entity.Location;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
-import service.weather.CurrentWeather;
-import service.weather.DailyWeather;
+import service.weather.OWCurrentWeatherAdapter;
+import service.weather.OWDailyWeatherAdapter;
 import service.weather.WeatherForecast;
+import service.weather.factory.WeatherFactory;
 import utility.PropertiesUtility;
 
-public class OpenWeatherFactory implements WeatherFactory{
+public class OpenWeatherFactory implements WeatherFactory {
     private final String apiKey;
     private final String uri;
     private final String units = "metric";
@@ -31,10 +32,13 @@ public class OpenWeatherFactory implements WeatherFactory{
         WeatherForecast forecast = new WeatherForecast();
         try {
             var currentWeather = seeCurrentWeatherForecast(latitude, longitude);
-            var dailyWeather = seeDailyWeatherForecast(latitude, longitude);
+            var currentWeatherAdapter = new OWCurrentWeatherAdapter(currentWeather);
 
-            forecast.setCurrent(currentWeather);
-            forecast.setDaily(dailyWeather);
+            var dailyWeather = seeDailyWeatherForecast(latitude, longitude);
+            var dailyWeatherAdapter = new OWDailyWeatherAdapter(dailyWeather);
+
+            forecast.setCurrent(currentWeatherAdapter);
+            forecast.setDaily(dailyWeatherAdapter);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -42,7 +46,7 @@ public class OpenWeatherFactory implements WeatherFactory{
         return forecast;
     }
 
-    private CurrentWeather seeCurrentWeatherForecast(double latitude, double longitude) throws JsonProcessingException {
+    private OWCurrentWeather seeCurrentWeatherForecast(double latitude, double longitude) throws JsonProcessingException {
         HttpResponse<JsonNode> jsonResponse =
                 Unirest.get(uri)
                         .header("accept", "application/json")
@@ -56,10 +60,10 @@ public class OpenWeatherFactory implements WeatherFactory{
         var objectMapper = new ObjectMapper();
         var json = jsonResponse.getBody().toString();
 
-        return objectMapper.readValue(json, CurrentWeather.class);
+        return objectMapper.readValue(json, OWCurrentWeather.class);
     }
 
-    private DailyWeather seeDailyWeatherForecast(double latitude, double longitude) throws JsonProcessingException {
+    private OWDailyWeather seeDailyWeatherForecast(double latitude, double longitude) throws JsonProcessingException {
         HttpResponse<JsonNode> jsonResponse =
                 Unirest.get(uri)
                         .header("accept", "application/json")
@@ -73,6 +77,6 @@ public class OpenWeatherFactory implements WeatherFactory{
         var objectMapper = new ObjectMapper();
         var json = jsonResponse.getBody().toString();
 
-        return objectMapper.readValue(json, DailyWeather.class);
+        return objectMapper.readValue(json, OWDailyWeather.class);
     }
 }
